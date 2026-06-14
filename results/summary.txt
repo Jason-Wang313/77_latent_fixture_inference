@@ -1,16 +1,18 @@
-Submission-hardening experiment for paper 77 latent_fixture_inference
-Seven seeds, 600 episodes per seed, strong baselines, ablations, stress sweep, and negative cases.
-observed_only_behavior_clone hidden_mode_shift mean_success=0.4014 ci95=0.0163 tail=0.5986
-observed_only_behavior_clone combined_stress mean_success=0.3205 ci95=0.0154 tail=0.6795
-data_augmentation_wam hidden_mode_shift mean_success=0.4964 ci95=0.0061 tail=0.5036
-data_augmentation_wam combined_stress mean_success=0.4157 ci95=0.0173 tail=0.5843
-scalar_uncertainty_planner hidden_mode_shift mean_success=0.5676 ci95=0.0181 tail=0.4324
-scalar_uncertainty_planner combined_stress mean_success=0.4955 ci95=0.0138 tail=0.5045
-ensemble_disagreement_planner hidden_mode_shift mean_success=0.5900 ci95=0.0127 tail=0.4100
-ensemble_disagreement_planner combined_stress mean_success=0.5459 ci95=0.0161 tail=0.4541
-conformal_risk_filter hidden_mode_shift mean_success=0.6086 ci95=0.0101 tail=0.3914
-conformal_risk_filter combined_stress mean_success=0.5655 ci95=0.0213 tail=0.4345
-proposed_branch_mechanism hidden_mode_shift mean_success=0.7050 ci95=0.0122 tail=0.2950
-proposed_branch_mechanism combined_stress mean_success=0.6709 ci95=0.0240 tail=0.3291
-oracle_branch_upper_bound hidden_mode_shift mean_success=0.7700 ci95=0.0152 tail=0.2300
-oracle_branch_upper_bound combined_stress mean_success=0.7522 ci95=0.0210 tail=0.2478
+Paper 77 latent_fixture_inference real fixture-physics rebuild
+Terminal recommendation: KILL_ARCHIVE
+Reason: latent_fixture_inference does not honestly clear strongest non-oracle baseline prototype_system_id (proposed=0.671, best=0.771, paired diff=-0.100+/-0.086, fixture_diff=-0.286, param_reduction=-0.023, damage_reduction=-0.086, repeat_reduction=-0.100, efficiency_diff=-0.078).
+Main rollout rows: 2450
+Probe observation rows: 3500
+Seed metric rows: 245
+Ablation rows: 343
+Stress rows: 1470
+Seeds: [0, 1, 2, 3, 4, 5, 6]
+
+Combined-fixture-stress summary:
+oracle_fixture success=0.90000 ci95=0.09564 fixture_acc=1.00000 param_error=0.00000 force_violation=0.00000 damage=0.02857 repeated=0.10000
+prototype_system_id success=0.77143 ci95=0.08243 fixture_acc=0.95714 param_error=0.27443 force_violation=0.08571 damage=0.08571 repeated=0.22857
+ensemble_uncertainty_planner success=0.70000 ci95=0.09564 fixture_acc=0.95714 param_error=0.36333 force_violation=0.11429 damage=0.08571 repeated=0.30000
+latent_fixture_inference success=0.67143 ci95=0.05600 fixture_acc=0.67143 param_error=0.29729 force_violation=0.21429 damage=0.17143 repeated=0.32857
+particle_filter_fixture success=0.61429 ci95=0.10844 fixture_acc=0.87143 param_error=0.34429 force_violation=0.15714 damage=0.18571 repeated=0.38571
+force_threshold_heuristic success=0.34286 ci95=0.08400 fixture_acc=0.47143 param_error=0.64071 force_violation=0.41429 damage=0.30000 repeated=0.65714
+visible_only_policy success=0.20000 ci95=0.08554 fixture_acc=0.22857 param_error=0.69686 force_violation=0.62857 damage=0.41429 repeated=0.80000
