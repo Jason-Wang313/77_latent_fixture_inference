@@ -1,19 +1,15 @@
 # ICLR Main Gate
 
-Paper: 77 latent_fixture_inference
+Gate status: KILL_ARCHIVE.
 
-Existing v2 decision: KILL_ARCHIVE
-
-Gate verdict: KILL_ARCHIVE
-
-Evidence digest: 934b5a8f2b7eb295
+The v4 rebuild adds real local fixture-physics evidence, but the central method fails its decisive empirical gate. `latent_fixture_inference` does not beat the strongest non-oracle baseline on `combined_fixture_stress`; it loses to `prototype_system_id` by 0.100 +/- 0.086 paired success.
 
 Fatal blockers:
-- Synthetic-only evidence.
-- Template-generated experiment and writing.
-- No real robot or high-fidelity benchmark.
-- No trained WAM/model checkpoint.
-- No implemented real baselines.
-- No manual exhaustive related-work synthesis.
 
-The only honest main-conference-safe decision is to archive rather than overclaim.
+- Main method loses to a simpler prototype system-ID baseline.
+- Fixture accuracy is much lower than the strongest baselines.
+- Damage and repeated failures are higher than the strongest baseline.
+- No real robot validation.
+- No external benchmark validation.
+
+Do not submit to ICLR main.

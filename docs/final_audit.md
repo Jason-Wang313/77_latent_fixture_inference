@@ -1,12 +1,36 @@
 # Final Audit
 
-1. Chosen thesis: Latent Fixture Inference explores `Infer unseen fixtures and environmental supports from action resistance patterns.` for tool use and manipulation.
-2. ICLR-main decision: KILL_ARCHIVE.
-3. Submission-hardening version: v3.
-4. Reason: synthetic-only, template-generated evidence cannot support ICLR main-conference robotics claims.
-5. Closest hostile prior work: see `docs/hostile_prior_work.md`, `docs/hostile_prior_work_100_cards.csv`, and `docs/hostile_reviewer_response.md`.
-6. Reproducibility: synthetic code runs, but no real robot or high-fidelity benchmark is reproduced.
-7. Claim-validity status: main-conference claims killed; archive memo retained.
-8. Exact Downloads PDF path: `C:/Users/wangz/Downloads/77.pdf`
-9. GitHub URL: https://github.com/Jason-Wang313/77_latent_fixture_inference
-10. Confirmation: no visible Desktop copy was requested or made.
+Paper: 77 latent_fixture_inference
+
+Version: v4
+
+Terminal decision: KILL_ARCHIVE
+
+## Evidence Completed
+
+- Local fixture-physics manipulation benchmark.
+- Hidden fixture families: free, clamp, hinge, slot, suction, tether.
+- Seven seeds: 0 through 6.
+- Five evaluation splits.
+- 2,450 main rollout rows.
+- 3,500 probe observation rows.
+- 245 seed-level metric rows.
+- 343 ablation rollout rows.
+- 1,470 stress-sweep raw rows.
+- 12 negative cases.
+
+## Gate Result
+
+The proposed method fails the decisive gate.
+
+- `latent_fixture_inference`: 0.671 +/- 0.056 combined-fixture-stress success.
+- `prototype_system_id`: 0.771 +/- 0.082 combined-fixture-stress success.
+- Paired success difference: -0.100 +/- 0.086.
+- Fixture-accuracy difference: -0.286.
+- Parameter-error reduction: -0.023, meaning worse parameter error.
+- Damage reduction: -0.086, meaning more damage.
+- Repeated-failure reduction: -0.100, meaning more repeated failures.
+
+## Audit Conclusion
+
+The repo is now a real negative-result artifact. It should not be submitted to ICLR main.

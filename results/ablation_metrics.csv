@@ -1,6 +1,8 @@
-ablation,combined_stress_mean_success,ci95_success,interpretation
-full_proposed_branch_mechanism,0.6652,0.0194,all components
-minus_branch_atlas,0.5564,0.0096,removes explicit unrealized futures
-minus_tail_risk_objective,0.5852,0.0181,uses mean predicted value only
-minus_diagnostic_probe,0.6024,0.0133,does not actively test ambiguous physical modes
-minus_failure_memory,0.6162,0.0189,does not reuse repaired beliefs
+method,split,seeds,mean_success,ci95_success,mean_tail_risk,ci95_tail_risk,mean_fixture_correct,ci95_fixture_correct,mean_parameter_error,ci95_parameter_error,mean_force_violation,ci95_force_violation,mean_damage,ci95_damage,mean_repeated_failure,ci95_repeated_failure,mean_path_efficiency,ci95_path_efficiency,mean_energy,ci95_energy,mean_calibration_brier,ci95_calibration_brier
+latent_fixture_full,combined_fixture_stress,7,0.57143,0.08641,0.42857,0.08641,0.67347,0.05164,0.29613,0.02944,0.22449,0.05657,0.14286,0.08641,0.42857,0.08641,0.47080,0.05155,2.11609,0.05067,0.09700,0.04160
+latent_fixture_no_compliance_anisotropy,combined_fixture_stress,7,0.57143,0.08641,0.42857,0.08641,0.63266,0.05657,0.37939,0.03224,0.22449,0.10328,0.14286,0.08641,0.42857,0.08641,0.46247,0.06691,2.11901,0.08287,0.08213,0.02306
+latent_fixture_no_hysteresis_memory,combined_fixture_stress,7,0.48980,0.05657,0.51020,0.05657,0.53061,0.05164,0.43755,0.02943,0.32653,0.11776,0.36735,0.18184,0.51020,0.05657,0.41829,0.03469,2.20590,0.11036,0.08890,0.05956
+latent_fixture_no_particle_refinement,combined_fixture_stress,7,0.22449,0.10328,0.77551,0.10328,0.28571,0.08641,0.51714,0.04925,0.51020,0.13466,0.28571,0.06110,0.77551,0.10328,0.24584,0.07231,2.39483,0.10553,0.05162,0.03038
+latent_fixture_no_release_cues,combined_fixture_stress,7,0.48980,0.08327,0.51020,0.08327,0.57143,0.08641,0.41429,0.04925,0.26530,0.11314,0.22449,0.14787,0.51020,0.08327,0.44510,0.05484,2.15366,0.09329,0.08112,0.03261
+latent_fixture_no_safety_margin,combined_fixture_stress,7,0.44898,0.07303,0.55102,0.07303,0.67347,0.05164,0.29613,0.02944,0.63266,0.08327,0.44898,0.18762,0.55102,0.07303,0.41447,0.04928,2.42152,0.07192,0.13258,0.07893
+latent_fixture_no_torque_features,combined_fixture_stress,7,0.32653,0.10066,0.67347,0.10066,0.34694,0.08327,0.54224,0.04746,0.34694,0.13466,0.30612,0.09522,0.67347,0.10066,0.30659,0.06614,2.25928,0.09779,0.06733,0.04574

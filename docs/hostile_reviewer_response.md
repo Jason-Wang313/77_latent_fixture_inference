@@ -1,26 +1,17 @@
-        # Hostile Reviewer Response
+# Hostile Reviewer Response
 
-        Paper: 77 Latent Fixture Inference
+## Attack: This is just system identification.
 
-        ## Strongest Technical Threats
-        - Grasp to Act: Dexterous Grasping for Tool Use in Dynamic Settings (2026)
-- PI-VLA: Adaptive Symmetry-Aware Decision-Making for Long-Horizon Vision-Language-Action Manipulation (2026)
-- A State-Adaptive Koopman Control Framework for Real-Time Deformable Tool Manipulation in Robotic Environmental Swabbing (2026)
-- PLATO: Planning with LLMs and Affordances for Tool Manipulation (2026)
-- LangForce: Bayesian Decomposition of Vision Language Action Models via Latent Action Queries (2026)
-- EveryDayVLA: A Vision-Language-Action Model for Affordable Robotic Manipulation (2025)
-- Object Manipulation Scaffolds the Development of Tool Use in Children (n.d.)
-- TinyVLA: Towards Fast, Data-Efficient Vision-Language-Action Models for Robotic Manipulation (2024)
+Response: In the v4 evidence, this attack is correct. `prototype_system_id` beats the proposed method on the decisive split.
 
-        ## ICLR Main Response
-        A hostile ICLR reviewer would be correct to reject this as a main-conference submission. The v2 paper has reproducible synthetic evidence and careful limitations, but it does not contain the real robot, high-fidelity simulator, learned model, or manual related-work depth needed for the ICLR main track.
+## Attack: The structured fixture semantics add brittleness.
 
-        ## Honest Action
-        The paper is marked `KILL_ARCHIVE`. This avoids converting a generated workshop-style idea into an overstated main-conference claim.
+Response: Supported. `latent_fixture_inference` reaches only 0.671 fixture-stress success, with 0.671 fixture accuracy, while `prototype_system_id` reaches 0.771 success and 0.957 fixture accuracy.
 
-        ## What Would Be Needed To Revive
-        - Real robot or high-fidelity benchmark experiments.
-        - Implemented model and baselines, not synthetic probability tables.
-        - Manual full-paper related-work audit.
-        - Paper-specific writing and figures.
-        - Evidence that the core mechanism is learned and useful under deployment shift.
+## Attack: The method is less safe than the simple baseline.
+
+Response: Supported. The proposed method has higher force violation, damage, and repeated failure than `prototype_system_id`.
+
+## Attack: This is not ICLR-main-ready.
+
+Response: Correct. The terminal decision is `KILL_ARCHIVE`.

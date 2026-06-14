@@ -1,19 +1,24 @@
 # Experiment Rigor Checklist
 
-## v2 Synthetic Rigor
-- [x] Multiple seeds.
-- [x] Error bars.
-- [x] Stronger synthetic baselines.
+## v4 Evidence
+
+- [x] Local high-fidelity diagnostic fixture benchmark.
+- [x] Continuous force/displacement probe observations.
+- [x] Hidden fixture families and parameter shifts.
+- [x] Seven random seeds.
+- [x] Strong non-oracle baselines.
+- [x] Oracle upper bound.
+- [x] Paired comparisons.
 - [x] Ablations.
-- [x] Stress tests.
+- [x] Stress sweeps.
 - [x] Negative cases.
+- [x] Raw probe and rollout CSVs.
 
-## ICLR Main Bar
-- [ ] Real-robot validation.
-- [ ] High-fidelity simulator benchmark.
-- [ ] Implemented learned model.
-- [ ] Implemented real competing baselines.
-- [ ] Manual related-work synthesis.
-- [ ] Paper-specific qualitative figures.
+## Missing For ICLR Main
 
-Decision: fail ICLR main empirical-rigor gate; archive.
+- [ ] Real robot validation.
+- [ ] External benchmark validation.
+- [ ] Method that beats prototype system identification.
+- [ ] Full manual related-work synthesis.
+
+Decision: fail local evidence gate and ICLR-main readiness gate.

@@ -4,42 +4,105 @@
 \usepackage{hyperref}
 \usepackage{url}
 \usepackage{booktabs}
-\title{Latent Fixture Inference: ICLR Main-Conference Gate Archive}
+\usepackage{graphicx}
+\title{Latent Fixture Inference Is Outperformed by Prototype System Identification}
 \author{Anonymous Authors}
 \begin{document}
 \maketitle
+
 \begin{abstract}
-This document is not an ICLR main-conference submission. It is the v3 main-conference gate for a generated robotics draft about tool use and manipulation. The original research bet was: Infer unseen fixtures and environmental supports from action resistance patterns. After a stricter hostile review, the honest terminal decision is \textbf{KILL/ARCHIVE}. Submission-hardening version: v3.
+We rebuilt a generated robotics idea into a concrete fixture-physics study: can a robot infer unseen clamps, hinges, slots, suction pads, and tethers from physical resistance probes, then use that latent fixture belief for safer manipulation? The v4 rebuild implements a local continuous benchmark with six fixture families, force/displacement/torque/release/recoil observations, seven random seeds, implemented baselines, an oracle, ablations, stress sweeps, and negative cases. The result is negative. On the decisive \texttt{combined\_fixture\_stress} split, \texttt{latent\_fixture\_inference} reaches $0.671 \pm 0.056$ success, while the strongest non-oracle baseline, \texttt{prototype\_system\_id}, reaches $0.771 \pm 0.082$. The paired success difference is $-0.100 \pm 0.086$. The proposed method also has lower fixture accuracy, worse parameter error, more force violations, more damage, and more repeated failures. We therefore mark the paper \textbf{KILL/ARCHIVE} for ICLR main.
 \end{abstract}
 
-\section{Gate Decision}
-The v2 paper was workshop-only. Under the active ICLR-main standard, that is insufficient. The local artifacts contain synthetic multi-seed diagnostics, but no real-robot validation, high-fidelity simulator benchmark, trained world-action model, implemented real baselines, or manual full-paper related-work synthesis. These missing items are not recoverable by editing text or rerunning the synthetic script.
+\section{Decision}
+This document is the v4 ICLR-main gate for Paper 77, \emph{Latent Fixture Inference}. The previous version was killed because it only contained a synthetic template. The current rebuild adds a real local fixture-physics benchmark and implemented baselines. The rejection reason has changed: evidence now exists, but it refutes the central submission claim.
 
-\section{Fatal ICLR-Main Blockers}
+\section{Hypothesis}
+The tested hypothesis is that latent fixtures such as clamps, hinges, slots, suction pads, and tethers can be inferred from action-resistance probes and that an explicit structured fixture belief should improve downstream manipulation. The paper only passes the local gate if this structured method improves closed-loop success, fixture identification, safety, and repeated-failure rates relative to strong non-oracle baselines.
+
+\section{Benchmark}
+The benchmark simulates a 2D tool or object manipulated through probe actions. Each scenario samples a hidden fixture family, anchor or axis parameters, stiffness, friction, release threshold, observation noise, and a weak visual hint. Probe observations record force vector, contact point, displacement, rotation, resistance, slip, release cue, recoil, and torque. The downstream planner chooses among direct translation, clamp release, hinge rotation, slot following, suction peeling, tether unwinding, or cautious probing.
+
+Five splits are evaluated: \texttt{nominal\_visible\_fixture}, \texttt{hidden\_clamp\_hinge}, \texttt{slot\_axis\_shift}, \texttt{adhesive\_tether\_fixture}, and \texttt{combined\_fixture\_stress}. The full run contains 2,450 main rollout rows, 3,500 probe observation rows, 245 seed-level metric rows, 343 ablation rollout rows, and 1,470 stress-sweep raw rows. All intervals are 95 percent confidence intervals over seed-level means.
+
+\section{Methods}
+The implemented methods are:
 \begin{itemize}
-\item Evidence is synthetic and generated from a shared batch template.
-\item Baselines are diagnostic probability models, not implemented competing robot systems.
-\item Ablations do not correspond to a trained model checkpoint.
-\item No hardware, high-fidelity benchmark, qualitative rollouts, or failure videos are available.
-\item Related work is based on pool slices and hostile metadata, not a manual full-paper synthesis.
-\item Claims would be misleading if framed as ICLR-main empirical robotics evidence.
+\item \texttt{visible\_only\_policy}: acts from the weak visual hint and otherwise assumes a free object.
+\item \texttt{force\_threshold\_heuristic}: maps high resistance, release cues, anisotropy, or recoil to a generic fixture guess.
+\item \texttt{prototype\_system\_id}: nearest-prototype fixture classifier trained on simulated probe traces.
+\item \texttt{ensemble\_uncertainty\_planner}: bootstrap prototype ensemble with conservative action choice under disagreement.
+\item \texttt{particle\_filter\_fixture}: combines prototype likelihoods and rule likelihoods.
+\item \texttt{latent\_fixture\_inference}: proposed method using compliance anisotropy, torque signatures, release cues, hysteresis/recoil, particle refinement, and safety margins.
+\item \texttt{oracle\_fixture}: upper bound with true fixture family and parameters.
 \end{itemize}
 
-\section{Hostile Prior-Work Pressure}
-The closest local hostile records include:
-\begin{itemize}
-\item Grasp to Act: Dexterous Grasping for Tool Use in Dynamic Settings (2026)
-\item PI-VLA: Adaptive Symmetry-Aware Decision-Making for Long-Horizon Vision-Language-Action Manipulation (2026)
-\item A State-Adaptive Koopman Control Framework for Real-Time Deformable Tool Manipulation in Robotic Environmental Swabbing (2026)
-\item PLATO: Planning with LLMs and Affordances for Tool Manipulation (2026)
-\item LangForce: Bayesian Decomposition of Vision Language Action Models via Latent Action Queries (2026)
-\end{itemize}
-These works make generic world models, uncertainty, model-based planning, and robot policy robustness crowded. Without real empirical evidence, the remaining novelty boundary is too weak for ICLR main.
+\section{Main Results}
+Table~\ref{tab:main} shows the decisive combined-fixture-stress result. The oracle indicates that the task is solvable when the fixture is known. However, the proposed method loses to a simple prototype system-ID baseline.
 
-\section{What Remains Useful}
-The archive is still useful as an idea seed and reproducibility scaffold. The synthetic code, stress-test CSVs, reviewer attacks, and novelty-boundary docs can inform a future project. The correct next step is not more paper polishing; it is new evidence: implemented models, real baselines, manual related work, and robot or high-fidelity simulator validation.
+\begin{table}[h]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lcccccc}
+\toprule
+Method & Success & Fixture acc. & Param err. & Force viol. & Damage & Repeat fail \\
+\midrule
+\texttt{oracle\_fixture} & $0.900 \pm 0.096$ & 1.000 & 0.000 & 0.000 & 0.029 & 0.100 \\
+\texttt{prototype\_system\_id} & $0.771 \pm 0.082$ & 0.957 & 0.274 & 0.086 & 0.086 & 0.229 \\
+\texttt{ensemble\_uncertainty\_planner} & $0.700 \pm 0.096$ & 0.957 & 0.363 & 0.114 & 0.086 & 0.300 \\
+\texttt{latent\_fixture\_inference} & $0.671 \pm 0.056$ & 0.671 & 0.297 & 0.214 & 0.171 & 0.329 \\
+\texttt{particle\_filter\_fixture} & $0.614 \pm 0.108$ & 0.871 & 0.344 & 0.157 & 0.186 & 0.386 \\
+\texttt{force\_threshold\_heuristic} & $0.343 \pm 0.084$ & 0.471 & 0.641 & 0.414 & 0.300 & 0.657 \\
+\texttt{visible\_only\_policy} & $0.200 \pm 0.086$ & 0.229 & 0.697 & 0.629 & 0.414 & 0.800 \\
+\bottomrule
+\end{tabular}
+\caption{Combined-fixture-stress results. Success is downstream manipulation success after fixture inference.}
+\label{tab:main}
+\end{table}
 
-\section{Terminal Action}
-Decision: \textbf{KILL/ARCHIVE for ICLR main}. Do not submit this paper to ICLR main in the current form. Revival requires a substantially new empirical project.
+The paired proposed-minus-\texttt{prototype\_system\_id} success difference is $-0.100 \pm 0.086$. Fixture-accuracy difference is -0.286. Parameter-error reduction is -0.023, meaning the proposed method is worse. Damage reduction is -0.086, meaning it causes more damage. Repeated-failure reduction is -0.100, meaning it repeats failures more often. This fails the gate.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.95\linewidth]{../figures/latent_fixture_success.png}
+\caption{Combined-fixture-stress success. The proposed structured latent-fixture method loses to prototype system identification.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.95\linewidth]{../figures/latent_fixture_accuracy.png}
+\caption{Fixture-type accuracy. The proposed method misclassifies too many hidden fixtures relative to prototype and ensemble baselines.}
+\end{figure}
+
+\section{Ablations}
+The ablations show that the proposed components matter internally, but not enough to beat the baseline. The full ablation reaches $0.571 \pm 0.086$ success on its ablation scenarios. Removing particle refinement drops to 0.224; removing torque features drops to 0.327; removing release cues or hysteresis memory drops to 0.490. These are mechanism signals, not submission support: the best full-system baseline still wins.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.90\linewidth]{../figures/latent_fixture_ablation_success.png}
+\caption{Ablation success. The components help relative to damaged versions of the method, but the full method still fails against the strongest baseline.}
+\end{figure}
+
+\section{Stress Sweep}
+Stress sweeps vary fixture ambiguity, stiffness, noise, and slip. The proposed method does not dominate the stress curve. At stress level 1.00, \texttt{prototype\_system\_id} reaches $0.694 \pm 0.177$ success, while \texttt{latent\_fixture\_inference} reaches $0.469 \pm 0.133$.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.90\linewidth]{../figures/latent_fixture_stress_sweep.png}
+\caption{Stress sweep success. Prototype system identification is more robust than the proposed structured fixture rules at high stress.}
+\end{figure}
+
+\section{Related Work Pressure}
+Tool-use and manipulation are crowded with dexterous tool-use systems \citep{prior1}, vision-language-action manipulation models \citep{prior2,prior5,prior6,prior8}, deformable tool-control systems \citep{prior3}, LLM-affordance planners \citep{prior4}, and older differentiable-physics tool-use planners. In that context, latent fixture inference must provide a clear advantage over system identification or learned probe classifiers. It does not in the current evidence.
+
+\section{Limitations}
+This rebuild is local and diagnostic. It lacks real robot validation, external benchmark evaluation, videos, and a full manual related-work synthesis. Those limitations would matter even if the method won. Because the method loses the local benchmark, the archive decision is stronger.
+
+\section{Conclusion}
+Paper 77 should not be submitted to ICLR main. The v4 rebuild provides useful evidence, but the evidence is negative: the proposed structured latent fixture inference is outperformed by a simpler prototype system-ID baseline. The correct terminal state is \textbf{KILL/ARCHIVE}.
+
+\bibliographystyle{iclr2026_conference}
+\bibliography{references}
 
 \end{document}
