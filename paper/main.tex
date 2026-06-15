@@ -40,7 +40,7 @@ The implemented methods are:
 \section{Main Results}
 Table~\ref{tab:main} shows the decisive combined-fixture-stress result. The oracle indicates that the task is solvable when the fixture is known. However, the proposed method loses to a simple prototype system-ID baseline.
 
-\begin{table}[h]
+\begin{table}[tbp]
 \centering
 \scriptsize
 \setlength{\tabcolsep}{3pt}
@@ -63,13 +63,13 @@ Method & Success & Fixture acc. & Param err. & Force viol. & Damage & Repeat fai
 
 The paired proposed-minus-\texttt{prototype\_system\_id} success difference is $-0.100 \pm 0.086$. Fixture-accuracy difference is -0.286. Parameter-error reduction is -0.023, meaning the proposed method is worse. Damage reduction is -0.086, meaning it causes more damage. Repeated-failure reduction is -0.100, meaning it repeats failures more often. This fails the gate.
 
-\begin{figure}[h]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=0.95\linewidth]{../figures/latent_fixture_success.png}
 \caption{Combined-fixture-stress success. The proposed structured latent-fixture method loses to prototype system identification.}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=0.95\linewidth]{../figures/latent_fixture_accuracy.png}
 \caption{Fixture-type accuracy. The proposed method misclassifies too many hidden fixtures relative to prototype and ensemble baselines.}
@@ -78,7 +78,7 @@ The paired proposed-minus-\texttt{prototype\_system\_id} success difference is $
 \section{Ablations}
 The ablations show that the proposed components matter internally, but not enough to beat the baseline. The full ablation reaches $0.571 \pm 0.086$ success on its ablation scenarios. Removing particle refinement drops to 0.224; removing torque features drops to 0.327; removing release cues or hysteresis memory drops to 0.490. These are mechanism signals, not submission support: the best full-system baseline still wins.
 
-\begin{figure}[h]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=0.90\linewidth]{../figures/latent_fixture_ablation_success.png}
 \caption{Ablation success. The components help relative to damaged versions of the method, but the full method still fails against the strongest baseline.}
@@ -87,7 +87,7 @@ The ablations show that the proposed components matter internally, but not enoug
 \section{Stress Sweep}
 Stress sweeps vary fixture ambiguity, stiffness, noise, and slip. The proposed method does not dominate the stress curve. At stress level 1.00, \texttt{prototype\_system\_id} reaches $0.694 \pm 0.177$ success, while \texttt{latent\_fixture\_inference} reaches $0.469 \pm 0.133$.
 
-\begin{figure}[h]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=0.90\linewidth]{../figures/latent_fixture_stress_sweep.png}
 \caption{Stress sweep success. Prototype system identification is more robust than the proposed structured fixture rules at high stress.}
