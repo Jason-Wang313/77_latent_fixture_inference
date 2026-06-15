@@ -22,3 +22,10 @@
 - Added probe observations, implemented baselines, oracle, paired stats, ablations, stress sweeps, figures, and a rewritten manuscript.
 - `latent_fixture_inference` loses to `prototype_system_id` on the decisive split.
 - Terminal decision: KILL_ARCHIVE.
+
+## 2026-06-15 Continuation Audit
+
+- Rechecked code, CSV, ablation, stress, BibTeX/PDF, artifact-location, public-GitHub, and stale-documentation gates.
+- Rebuilt the PDF after adding bibliography authors and replacing fragile `[h]` float specifiers.
+- Confirmed the negative result: the proposed method loses to `prototype_system_id` on success, fixture accuracy, safety, repeated failures, and stress robustness.
+- Terminal decision remains: KILL_ARCHIVE.

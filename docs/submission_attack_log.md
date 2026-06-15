@@ -192,3 +192,15 @@ Attack: No meaningful recoverable ICLR-main issue remains after archiving.
 Verdict: Terminal condition reached.
 
 Action: Mark KILL_ARCHIVE and stop.
+
+## Continuation Attack 2026-06-15
+
+The current v4 artifacts were attacked again.
+
+- Code, CSV, BibTeX/PDF, public GitHub, and Downloads-only artifact gates passed.
+- The central claim still fails: `latent_fixture_inference` reaches 0.671 +/- 0.056 success on `combined_fixture_stress`, while `prototype_system_id` reaches 0.771 +/- 0.082.
+- Paired proposed-minus-prototype success difference is -0.100 +/- 0.086 with 0/7 better seeds.
+- The proposed method has worse fixture accuracy, parameter error, force violation, damage, repeated failures, and path efficiency than the prototype baseline.
+- Stress evidence is unfavorable: the proposed method is below the best non-oracle method at every stress level.
+
+Updated terminal action: keep `KILL_ARCHIVE`; do not submit.
