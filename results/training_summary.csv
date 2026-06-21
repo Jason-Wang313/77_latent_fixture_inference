@@ -1,2 +1,2 @@
-quick_mode,seeds,seed_count,train_scenarios_per_fixture,eval_scenarios_per_split,ablation_scenarios,stress_scenarios,probe_count,main_rollout_rows,probe_rows,seed_metric_rows,ablation_rows,stress_rows,runtime_seconds
-False,0;1;2;3;4;5;6,7,34,10,7,7,10,2450,3500,245,343,1470,0.50
+quick_mode,seeds,seed_count,train_scenarios_per_fixture,eval_scenarios_per_split,ablation_scenarios,stress_scenarios,fixed_risk_scenarios,risk_budgets,probe_count,main_rollout_rows,probe_rows,seed_metric_rows,aggregate_seed_rows,ablation_rows,stress_rows,fixed_risk_rows,fixed_risk_seed_rows,runtime_seconds
+False,0;1;2;3;4;5;6;7,8,42,14,10,8,8,0.08;0.12;0.18;0.25,12,7280,6720,520,104,720,4480,2048,256,235.93

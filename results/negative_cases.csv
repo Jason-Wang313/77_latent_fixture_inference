@@ -1,13 +1,13 @@
 seed,scenario,fixture_type,estimated_fixture,action,force_violation,damage,parameter_error,lesson
-0,4003,clamp,suction,peel_then_translate,0,1,0.68000,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
-0,4005,slot,clamp,release_clamp_pull,1,0,0.68000,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
-0,4009,clamp,suction,peel_then_translate,0,1,0.68000,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
-1,4001,clamp,suction,peel_then_translate,1,1,0.68000,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
-1,4007,clamp,suction,peel_then_translate,1,0,0.68000,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
-1,4009,slot,clamp,release_clamp_pull,0,1,0.68000,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
-2,4001,slot,clamp,release_clamp_pull,1,1,0.68000,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
-2,4005,clamp,suction,peel_then_translate,1,0,0.68000,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
-2,4007,slot,clamp,release_clamp_pull,1,1,0.68000,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
-3,4003,clamp,suction,peel_then_translate,1,0,0.68000,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
-3,4005,slot,clamp,release_clamp_pull,0,0,0.68000,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
-3,4009,clamp,suction,peel_then_translate,1,0,0.68000,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
+0,4001,tether,tether,cautious_probe_pull,1,0,0.18630,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
+0,4003,clamp,suction,cautious_probe_pull,1,0,0.66000,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
+0,4004,hinge,hinge,pivot_rotate,0,0,0.17628,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
+0,4005,slot,slot,cautious_probe_pull,1,0,0.18479,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
+0,4007,tether,tether,cautious_probe_pull,0,0,0.18286,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
+0,4009,clamp,suction,peel_then_translate,0,0,0.66000,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
+0,4013,tether,tether,cautious_probe_pull,0,0,0.18208,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
+1,4001,clamp,suction,cautious_probe_pull,0,0,0.66000,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
+1,4005,tether,tether,cautious_probe_pull,0,0,0.18190,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
+1,4006,free,free,cautious_probe_pull,1,0,0.18093,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
+1,4007,clamp,suction,peel_then_translate,0,0,0.66000,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint
+1,4010,suction,suction,peel_then_translate,0,0,0.16051,latent fixture was inferred but the chosen release/manipulation plan did not safely satisfy the hidden constraint

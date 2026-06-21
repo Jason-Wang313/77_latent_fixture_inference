@@ -29,3 +29,12 @@
 - Rebuilt the PDF after adding bibliography authors and replacing fragile `[h]` float specifiers.
 - Confirmed the negative result: the proposed method loses to `prototype_system_id` on success, fixture accuracy, safety, repeated failures, and stress robustness.
 - Terminal decision remains: KILL_ARCHIVE.
+
+## v5 - Hostile-Review Expansion, 2026-06-21
+
+- Froze and executed the expanded CPU-only protocol before interpreting results.
+- Added stronger non-oracle baselines, aggregate hard-regime tests, fixed-risk budgets, larger stress sweeps, ablation seed metrics, and a dedicated validator.
+- Generated a 40-page ICLR-style archive manuscript with bright citation boxes and a clean final LaTeX log.
+- Validated exact evidence counts, Downloads-only `77.pdf`, no Desktop PDF, SHA256, and rendered visual quality.
+- `latent_fixture_inference_v5` loses to `adaptive_probe_then_act` on `combined_fixture_stress` and fails every fixed-risk gate.
+- Terminal decision remains: KILL_ARCHIVE.
