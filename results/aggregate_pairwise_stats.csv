@@ -1,0 +1,13 @@
+split,reference,comparison,paired_success_diff,ci95_success_diff,paired_fixture_accuracy_diff,paired_parameter_error_reduction,paired_force_violation_reduction,paired_damage_reduction,paired_repeated_failure_reduction,paired_efficiency_diff,reference_better_seeds,seeds
+aggregate_hard_regime,latent_fixture_inference_v5,adaptive_probe_then_act,-0.17634,0.03937,-0.11384,-0.02824,-0.17634,-0.11607,-0.17634,-0.15073,0,8
+aggregate_hard_regime,latent_fixture_inference_v5,bayesian_fixture_belief,-0.08259,0.05571,-0.07813,0.06372,-0.10268,-0.07589,-0.08259,-0.07885,1,8
+aggregate_hard_regime,latent_fixture_inference_v5,calibrated_prototype_system_id,-0.13839,0.03668,-0.11830,-0.03247,-0.11830,-0.09821,-0.13839,-0.12870,0,8
+aggregate_hard_regime,latent_fixture_inference_v5,ensemble_uncertainty_planner,-0.02232,0.02864,-0.11830,0.09366,-0.13616,-0.09822,-0.02232,-0.04069,2,8
+aggregate_hard_regime,latent_fixture_inference_v5,force_threshold_heuristic,0.37946,0.05642,0.47768,0.44541,0.27232,0.18527,0.37946,0.24617,8,8
+aggregate_hard_regime,latent_fixture_inference_v5,latent_fixture_inference,-0.04688,0.03098,0.12054,0.01394,-0.02678,-0.03125,-0.04688,-0.05446,0,8
+aggregate_hard_regime,latent_fixture_inference_v5,oracle_fixture,-0.22768,0.04712,-0.12723,-0.23729,-0.18750,-0.11830,-0.22768,-0.20480,0,8
+aggregate_hard_regime,latent_fixture_inference_v5,particle_filter_fixture,-0.08259,0.03496,-0.09152,0.06057,-0.10714,-0.05580,-0.08259,-0.08077,0,8
+aggregate_hard_regime,latent_fixture_inference_v5,prototype_system_id,-0.10045,0.03098,-0.11830,0.01780,-0.12723,-0.08259,-0.10045,-0.10015,0,8
+aggregate_hard_regime,latent_fixture_inference_v5,random_forest_probe_classifier,-0.14732,0.04117,-0.10937,0.01945,-0.11830,-0.08036,-0.14732,-0.12797,0,8
+aggregate_hard_regime,latent_fixture_inference_v5,robust_impedance_planner,-0.14955,0.05764,-0.11384,0.10091,-0.14955,-0.11384,-0.14955,-0.11833,0,8
+aggregate_hard_regime,latent_fixture_inference_v5,visible_only_policy,0.40178,0.05953,0.50670,0.36745,0.29464,0.18527,0.40178,0.22900,8,8

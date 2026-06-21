@@ -1,18 +1,76 @@
 Paper 77 latent_fixture_inference real fixture-physics rebuild
 Terminal recommendation: KILL_ARCHIVE
-Reason: latent_fixture_inference does not honestly clear strongest non-oracle baseline prototype_system_id (proposed=0.671, best=0.771, paired diff=-0.100+/-0.086, fixture_diff=-0.286, param_reduction=-0.023, damage_reduction=-0.086, repeat_reduction=-0.100, efficiency_diff=-0.078).
-Main rollout rows: 2450
-Probe observation rows: 3500
-Seed metric rows: 245
-Ablation rows: 343
-Stress rows: 1470
-Seeds: [0, 1, 2, 3, 4, 5, 6]
+Reason: latent_fixture_inference_v5 does not honestly clear the frozen local gate against strongest non-oracle baseline adaptive_probe_then_act (proposed=0.554, best=0.795, paired diff=-0.241+/-0.115, fixture_diff=-0.179, param_reduction=-0.055, damage_reduction=-0.179, repeat_reduction=-0.241, efficiency_diff=-0.206). Aggregate hard-regime diff against adaptive_probe_then_act is -0.176; max-stress diff against calibrated_prototype_system_id is -0.234; fixed-risk checks: budget 0.08: v5=0.266, best=adaptive_probe_then_act:0.703; budget 0.12: v5=0.266, best=adaptive_probe_then_act:0.719; budget 0.18: v5=0.266, best=calibrated_prototype_system_id:0.641; budget 0.25: v5=0.172, best=adaptive_probe_then_act:0.672; matching ablations: latent_fixture_v5_no_adaptive_probe, latent_fixture_v5_no_calibration; failed gates: main_success_margin, main_paired_lower_bound, diagnostic_safety_efficiency, aggregate_hard_regime, maximum_stress, fixed_risk, ablation_necessity.
+Main rollout rows: 7280
+Probe observation rows: 6720
+Seed metric rows: 520
+Aggregate seed rows: 104
+Ablation rows: 720
+Stress rows: 4480
+Fixed-risk rows: 2048
+Fixed-risk seed rows: 256
+Seeds: [0, 1, 2, 3, 4, 5, 6, 7]
 
 Combined-fixture-stress summary:
-oracle_fixture success=0.90000 ci95=0.09564 fixture_acc=1.00000 param_error=0.00000 force_violation=0.00000 damage=0.02857 repeated=0.10000
-prototype_system_id success=0.77143 ci95=0.08243 fixture_acc=0.95714 param_error=0.27443 force_violation=0.08571 damage=0.08571 repeated=0.22857
-ensemble_uncertainty_planner success=0.70000 ci95=0.09564 fixture_acc=0.95714 param_error=0.36333 force_violation=0.11429 damage=0.08571 repeated=0.30000
-latent_fixture_inference success=0.67143 ci95=0.05600 fixture_acc=0.67143 param_error=0.29729 force_violation=0.21429 damage=0.17143 repeated=0.32857
-particle_filter_fixture success=0.61429 ci95=0.10844 fixture_acc=0.87143 param_error=0.34429 force_violation=0.15714 damage=0.18571 repeated=0.38571
-force_threshold_heuristic success=0.34286 ci95=0.08400 fixture_acc=0.47143 param_error=0.64071 force_violation=0.41429 damage=0.30000 repeated=0.65714
-visible_only_policy success=0.20000 ci95=0.08554 fixture_acc=0.22857 param_error=0.69686 force_violation=0.62857 damage=0.41429 repeated=0.80000
+oracle_fixture success=0.90178 ci95=0.06969 fixture_acc=1.00000 param_error=0.00000 force_violation=0.00000 damage=0.03571 repeated=0.09822
+adaptive_probe_then_act success=0.79464 ci95=0.06713 fixture_acc=0.95536 param_error=0.22973 force_violation=0.03571 damage=0.05357 repeated=0.20536
+calibrated_prototype_system_id success=0.78571 ci95=0.09899 fixture_acc=0.97321 param_error=0.21446 force_violation=0.08036 damage=0.07143 repeated=0.21429
+robust_impedance_planner success=0.77679 ci95=0.07685 fixture_acc=0.95536 param_error=0.36163 force_violation=0.10714 damage=0.08929 repeated=0.22321
+random_forest_probe_classifier success=0.75893 ci95=0.08750 fixture_acc=0.94643 param_error=0.27876 force_violation=0.08929 damage=0.10714 repeated=0.24107
+prototype_system_id success=0.75000 ci95=0.08775 fixture_acc=0.97321 param_error=0.26527 force_violation=0.07143 damage=0.06250 repeated=0.25000
+bayesian_fixture_belief success=0.69643 ci95=0.05766 fixture_acc=0.89285 param_error=0.34607 force_violation=0.11607 damage=0.10714 repeated=0.30357
+particle_filter_fixture success=0.66964 ci95=0.10562 fixture_acc=0.89285 param_error=0.33357 force_violation=0.13393 damage=0.15179 repeated=0.33036
+latent_fixture_inference success=0.63393 ci95=0.04905 fixture_acc=0.63393 param_error=0.31866 force_violation=0.23214 damage=0.17857 repeated=0.36607
+ensemble_uncertainty_planner success=0.61607 ci95=0.09141 fixture_acc=0.97321 param_error=0.35651 force_violation=0.16071 damage=0.12500 repeated=0.38393
+latent_fixture_inference_v5 success=0.55357 ci95=0.05766 fixture_acc=0.77679 param_error=0.28495 force_violation=0.33929 damage=0.23214 repeated=0.44643
+force_threshold_heuristic success=0.37500 ci95=0.08261 fixture_acc=0.48214 param_error=0.63482 force_violation=0.40179 damage=0.26786 repeated=0.62500
+visible_only_policy success=0.17857 ci95=0.06481 fixture_acc=0.20536 param_error=0.71241 force_violation=0.61607 damage=0.42857 repeated=0.82143
+
+Aggregate hard-regime summary:
+oracle_fixture success=0.91072 ci95=0.03172 fixture_acc=1.00000 damage=0.02679 repeated=0.08928
+adaptive_probe_then_act success=0.85938 ci95=0.02137 fixture_acc=0.98661 damage=0.02902 repeated=0.14062
+robust_impedance_planner success=0.83259 ci95=0.04127 fixture_acc=0.98661 damage=0.03125 repeated=0.16741
+random_forest_probe_classifier success=0.83036 ci95=0.02475 fixture_acc=0.98214 damage=0.06473 repeated=0.16964
+calibrated_prototype_system_id success=0.82143 ci95=0.03031 fixture_acc=0.99107 damage=0.04688 repeated=0.17857
+prototype_system_id success=0.78348 ci95=0.01804 fixture_acc=0.99107 damage=0.06250 repeated=0.21652
+bayesian_fixture_belief success=0.76562 ci95=0.04409 fixture_acc=0.95089 damage=0.06920 repeated=0.23438
+particle_filter_fixture success=0.76562 ci95=0.04154 fixture_acc=0.96429 damage=0.08929 repeated=0.23438
+latent_fixture_inference success=0.72991 ci95=0.02333 fixture_acc=0.75223 damage=0.11384 repeated=0.27009
+ensemble_uncertainty_planner success=0.70536 ci95=0.04437 fixture_acc=0.99107 damage=0.04687 repeated=0.29464
+latent_fixture_inference_v5 success=0.68304 ci95=0.02267 fixture_acc=0.87277 damage=0.14509 repeated=0.31696
+force_threshold_heuristic success=0.30357 ci95=0.04950 fixture_acc=0.39509 damage=0.33036 repeated=0.69643
+visible_only_policy success=0.28125 ci95=0.04325 fixture_acc=0.36607 damage=0.33036 repeated=0.71875
+
+Fixed-risk combined-fixture-stress summary:
+budget=0.08 adaptive_probe_then_act success=0.70312 ci95=0.07936 damage=0.07812 repeated=0.26562 efficiency=0.56564
+budget=0.08 random_forest_probe_classifier success=0.57812 ci95=0.09187 damage=0.18750 repeated=0.28125 efficiency=0.50596
+budget=0.08 prototype_system_id success=0.56250 ci95=0.09260 damage=0.17188 repeated=0.21875 efficiency=0.51933
+budget=0.08 calibrated_prototype_system_id success=0.53125 ci95=0.12890 damage=0.14062 repeated=0.26562 efficiency=0.49568
+budget=0.08 particle_filter_fixture success=0.51562 ci95=0.12627 damage=0.17188 repeated=0.34375 efficiency=0.45769
+budget=0.08 bayesian_fixture_belief success=0.45312 ci95=0.13045 damage=0.18750 repeated=0.42188 efficiency=0.40982
+budget=0.08 robust_impedance_planner success=0.43750 ci95=0.12250 damage=0.29688 repeated=0.43750 efficiency=0.38987
+budget=0.08 latent_fixture_inference_v5 success=0.26562 ci95=0.08584 damage=0.35938 repeated=0.51562 efficiency=0.26461
+budget=0.12 adaptive_probe_then_act success=0.71875 ci95=0.15871 damage=0.06250 repeated=0.28125 efficiency=0.57193
+budget=0.12 calibrated_prototype_system_id success=0.60938 ci95=0.09753 damage=0.09375 repeated=0.23438 efficiency=0.53766
+budget=0.12 particle_filter_fixture success=0.59375 ci95=0.07678 damage=0.20312 repeated=0.31250 efficiency=0.49704
+budget=0.12 random_forest_probe_classifier success=0.54688 ci95=0.15997 damage=0.12500 repeated=0.34375 efficiency=0.48696
+budget=0.12 prototype_system_id success=0.50000 ci95=0.12250 damage=0.17188 repeated=0.31250 efficiency=0.47281
+budget=0.12 bayesian_fixture_belief success=0.43750 ci95=0.11341 damage=0.20312 repeated=0.43750 efficiency=0.40331
+budget=0.12 robust_impedance_planner success=0.42188 ci95=0.09187 damage=0.25000 repeated=0.42188 efficiency=0.38443
+budget=0.12 latent_fixture_inference_v5 success=0.26562 ci95=0.07229 damage=0.28125 repeated=0.54688 efficiency=0.26327
+budget=0.18 calibrated_prototype_system_id success=0.64062 ci95=0.13449 damage=0.04688 repeated=0.28125 efficiency=0.53418
+budget=0.18 adaptive_probe_then_act success=0.62500 ci95=0.15356 damage=0.12500 repeated=0.32812 efficiency=0.51562
+budget=0.18 particle_filter_fixture success=0.53125 ci95=0.07678 damage=0.23438 repeated=0.26562 efficiency=0.48322
+budget=0.18 prototype_system_id success=0.50000 ci95=0.13096 damage=0.14062 repeated=0.37500 efficiency=0.45306
+budget=0.18 random_forest_probe_classifier success=0.50000 ci95=0.12250 damage=0.14062 repeated=0.37500 efficiency=0.45266
+budget=0.18 bayesian_fixture_belief success=0.48438 ci95=0.09753 damage=0.20312 repeated=0.42188 efficiency=0.42202
+budget=0.18 robust_impedance_planner success=0.45312 ci95=0.10288 damage=0.23438 repeated=0.40625 efficiency=0.40203
+budget=0.18 latent_fixture_inference_v5 success=0.26562 ci95=0.07229 damage=0.34375 repeated=0.54688 efficiency=0.25985
+budget=0.25 adaptive_probe_then_act success=0.67188 ci95=0.06445 damage=0.06250 repeated=0.25000 efficiency=0.56244
+budget=0.25 prototype_system_id success=0.59375 ci95=0.13696 damage=0.06250 repeated=0.32812 efficiency=0.51095
+budget=0.25 calibrated_prototype_system_id success=0.56250 ci95=0.13890 damage=0.17188 repeated=0.23438 efficiency=0.51583
+budget=0.25 bayesian_fixture_belief success=0.54688 ci95=0.10288 damage=0.14062 repeated=0.37500 efficiency=0.46106
+budget=0.25 random_forest_probe_classifier success=0.51562 ci95=0.12627 damage=0.12500 repeated=0.35938 efficiency=0.46377
+budget=0.25 particle_filter_fixture success=0.48438 ci95=0.09753 damage=0.17188 repeated=0.42188 efficiency=0.43091
+budget=0.25 robust_impedance_planner success=0.48438 ci95=0.14224 damage=0.25000 repeated=0.34375 efficiency=0.43186
+budget=0.25 latent_fixture_inference_v5 success=0.17188 ci95=0.06445 damage=0.42188 repeated=0.57812 efficiency=0.20880

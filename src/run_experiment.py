@@ -17,14 +17,16 @@ import numpy as np
 
 BASE_SEED = 771_204_113
 QUICK_MODE = os.getenv("PAPER77_QUICK", "0") == "1"
-SEED_COUNT = int(os.getenv("PAPER77_SEED_COUNT", "1" if QUICK_MODE else "7"))
+SEED_COUNT = int(os.getenv("PAPER77_SEED_COUNT", "1" if QUICK_MODE else "8"))
 ONLY_SEEDS = os.getenv("PAPER77_ONLY_SEEDS", "").strip()
 SEEDS = [int(item) for item in ONLY_SEEDS.split(",") if item.strip()] if ONLY_SEEDS else list(range(SEED_COUNT))
-TRAIN_SCENARIOS = int(os.getenv("PAPER77_TRAIN_SCENARIOS", "8" if QUICK_MODE else "34"))
-EVAL_SCENARIOS = int(os.getenv("PAPER77_EVAL_SCENARIOS", "3" if QUICK_MODE else "10"))
-ABLATION_SCENARIOS = int(os.getenv("PAPER77_ABLATION_SCENARIOS", "3" if QUICK_MODE else "7"))
-STRESS_SCENARIOS = int(os.getenv("PAPER77_STRESS_SCENARIOS", "3" if QUICK_MODE else "7"))
-PROBES = int(os.getenv("PAPER77_PROBES", "8" if QUICK_MODE else "10"))
+TRAIN_SCENARIOS = int(os.getenv("PAPER77_TRAIN_SCENARIOS", "8" if QUICK_MODE else "42"))
+EVAL_SCENARIOS = int(os.getenv("PAPER77_EVAL_SCENARIOS", "3" if QUICK_MODE else "14"))
+ABLATION_SCENARIOS = int(os.getenv("PAPER77_ABLATION_SCENARIOS", "3" if QUICK_MODE else "10"))
+STRESS_SCENARIOS = int(os.getenv("PAPER77_STRESS_SCENARIOS", "3" if QUICK_MODE else "8"))
+FIXED_RISK_SCENARIOS = int(os.getenv("PAPER77_FIXED_RISK_SCENARIOS", "3" if QUICK_MODE else "8"))
+PROBES = int(os.getenv("PAPER77_PROBES", "8" if QUICK_MODE else "12"))
+RISK_BUDGETS = [float(item) for item in os.getenv("PAPER77_RISK_BUDGETS", "0.08,0.12,0.18,0.25").split(",") if item.strip()]
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULTS = ROOT / "results"
@@ -35,27 +37,53 @@ METHODS = [
     "visible_only_policy",
     "force_threshold_heuristic",
     "prototype_system_id",
+    "calibrated_prototype_system_id",
+    "random_forest_probe_classifier",
+    "bayesian_fixture_belief",
+    "robust_impedance_planner",
+    "adaptive_probe_then_act",
     "ensemble_uncertainty_planner",
     "particle_filter_fixture",
     "latent_fixture_inference",
+    "latent_fixture_inference_v5",
     "oracle_fixture",
 ]
 ABLATION_METHODS = [
-    "latent_fixture_full",
-    "latent_fixture_no_torque_features",
-    "latent_fixture_no_compliance_anisotropy",
-    "latent_fixture_no_release_cues",
-    "latent_fixture_no_hysteresis_memory",
-    "latent_fixture_no_particle_refinement",
-    "latent_fixture_no_safety_margin",
+    "latent_fixture_v5_full",
+    "latent_fixture_v5_no_torque_features",
+    "latent_fixture_v5_no_compliance_anisotropy",
+    "latent_fixture_v5_no_release_cues",
+    "latent_fixture_v5_no_hysteresis_memory",
+    "latent_fixture_v5_no_particle_refinement",
+    "latent_fixture_v5_no_safety_margin",
+    "latent_fixture_v5_no_calibration",
+    "latent_fixture_v5_no_adaptive_probe",
 ]
 STRESS_METHODS = [
     "prototype_system_id",
+    "calibrated_prototype_system_id",
+    "random_forest_probe_classifier",
+    "bayesian_fixture_belief",
+    "robust_impedance_planner",
+    "adaptive_probe_then_act",
     "ensemble_uncertainty_planner",
     "particle_filter_fixture",
-    "latent_fixture_inference",
+    "latent_fixture_inference_v5",
     "oracle_fixture",
 ]
+FIXED_RISK_METHODS = [
+    "prototype_system_id",
+    "calibrated_prototype_system_id",
+    "random_forest_probe_classifier",
+    "bayesian_fixture_belief",
+    "robust_impedance_planner",
+    "adaptive_probe_then_act",
+    "particle_filter_fixture",
+    "latent_fixture_inference_v5",
+]
+REFERENCE_METHOD = "latent_fixture_inference_v5"
+PROPOSED_FAMILY = {"latent_fixture_inference", "latent_fixture_inference_v5"}
+AGGREGATE_SPLITS = {"hidden_clamp_hinge", "slot_axis_shift", "adhesive_tether_fixture", "combined_fixture_stress"}
 
 
 @dataclass(frozen=True)
@@ -296,6 +324,7 @@ def generate_probes(scenario: Scenario) -> List[Dict[str, str]]:
 
 
 def feature_vector(probes: Sequence[Dict[str, str]], ablation: str | None = None) -> np.ndarray:
+    ablation_key = (ablation or "").replace("latent_fixture_v5_", "latent_fixture_")
     forces = np.array([[float(p["force_x"]), float(p["force_y"])] for p in probes], dtype=float)
     disps = np.array([[float(p["disp_x"]), float(p["disp_y"])] for p in probes], dtype=float)
     contacts = np.array([[float(p["contact_x"]), float(p["contact_y"])] for p in probes], dtype=float)
@@ -343,13 +372,13 @@ def feature_vector(probes: Sequence[Dict[str, str]], ablation: str | None = None
         ],
         dtype=float,
     )
-    if ablation == "latent_fixture_no_torque_features":
+    if ablation_key == "latent_fixture_no_torque_features":
         values[[13, 15, 16, 17, 18]] = 0.0
-    if ablation == "latent_fixture_no_compliance_anisotropy":
+    if ablation_key == "latent_fixture_no_compliance_anisotropy":
         values[[9, 10, 11, 12]] = 0.0
-    if ablation == "latent_fixture_no_release_cues":
+    if ablation_key == "latent_fixture_no_release_cues":
         values[[5, 6]] = 0.0
-    if ablation == "latent_fixture_no_hysteresis_memory":
+    if ablation_key == "latent_fixture_no_hysteresis_memory":
         values[[7, 8, 14]] = 0.0
     return np.nan_to_num(values, nan=0.0, posinf=0.0, neginf=0.0)
 
@@ -403,6 +432,7 @@ def prototype_probs(features: np.ndarray, means: Dict[str, np.ndarray], std: np.
 
 
 def rule_probs(features: np.ndarray, visible_hint: str, ablation: str | None = None) -> Dict[str, float]:
+    ablation_key = (ablation or "").replace("latent_fixture_v5_", "latent_fixture_")
     mean_disp, _, mean_res, max_res, mean_slip, mean_release, max_release, mean_recoil, max_recoil = features[:9]
     anisotropy = features[9]
     hinge_score = features[13]
@@ -414,18 +444,18 @@ def rule_probs(features: np.ndarray, visible_hint: str, ablation: str | None = N
     scores["slot"] += 2.1 * anisotropy + 0.8 * mean_slip - 0.4 * mean_release
     scores["suction"] += 3.2 * max_release + 2.1 * mean_release + 0.7 * mean_res - 0.4 * mean_slip
     scores["tether"] += 1.8 * max_recoil + 1.3 * mean_recoil + 0.7 * max(0.0, resist_disp_corr)
-    if ablation == "latent_fixture_no_release_cues":
+    if ablation_key == "latent_fixture_no_release_cues":
         scores["suction"] -= 1.4
     else:
         if max_release > 0.18 or mean_release > 0.10:
             scores["suction"] += 0.95
             scores["clamp"] -= 0.45
-    if ablation == "latent_fixture_no_hysteresis_memory":
+    if ablation_key == "latent_fixture_no_hysteresis_memory":
         scores["tether"] -= 1.3
         scores["clamp"] -= 0.4
-    if ablation == "latent_fixture_no_torque_features":
+    if ablation_key == "latent_fixture_no_torque_features":
         scores["hinge"] -= 1.2
-    if ablation == "latent_fixture_no_compliance_anisotropy":
+    if ablation_key == "latent_fixture_no_compliance_anisotropy":
         scores["slot"] -= 1.3
     if visible_hint in FIXTURE_TYPES:
         scores[visible_hint] += 0.65
@@ -433,6 +463,50 @@ def rule_probs(features: np.ndarray, visible_hint: str, ablation: str | None = N
     exps = {k: math.exp(v - mx) for k, v in scores.items()}
     denom = sum(exps.values())
     return {k: v / denom for k, v in exps.items()}
+
+
+def normalize_probs(scores: Dict[str, float]) -> Dict[str, float]:
+    clipped = {key: max(1e-9, float(value)) for key, value in scores.items()}
+    total = sum(clipped.values())
+    return {key: value / total for key, value in clipped.items()}
+
+
+def mix_probs(parts: Sequence[Tuple[float, Dict[str, float]]]) -> Dict[str, float]:
+    scores = {fixture: 0.0 for fixture in FIXTURE_TYPES}
+    total_weight = sum(weight for weight, _ in parts)
+    for weight, probs in parts:
+        for fixture in FIXTURE_TYPES:
+            scores[fixture] += weight * probs[fixture] / max(total_weight, 1e-9)
+    return normalize_probs(scores)
+
+
+def random_subspace_probe_probs(features: np.ndarray, models: PrototypeModels, seed: int) -> Dict[str, float]:
+    rng = rng_for(seed, 131_771, "probe_forest")
+    votes = {fixture: 1e-3 for fixture in FIXTURE_TYPES}
+    feature_count = len(features)
+    for tree in range(17):
+        mask = rng.choice(feature_count, size=max(5, feature_count // 2), replace=False)
+        scores: Dict[str, float] = {}
+        for fixture in FIXTURE_TYPES:
+            distance = float(np.linalg.norm((features[mask] - models.means[fixture][mask]) / models.std[mask]))
+            scores[fixture] = math.exp(-distance / (0.85 + 0.03 * tree))
+        best = max(scores, key=scores.get)
+        votes[best] += 1.0
+    return normalize_probs(votes)
+
+
+def bayesian_fixture_probs(features: np.ndarray, scenario: Scenario, models: PrototypeModels, ablation: str | None = None) -> Dict[str, float]:
+    proto = prototype_probs(features, models.means, models.std, temperature=0.92)
+    rules = rule_probs(features, scenario.visible_hint, ablation)
+    prior = {fixture: 0.08 for fixture in FIXTURE_TYPES}
+    if scenario.visible_hint in FIXTURE_TYPES:
+        prior[scenario.visible_hint] += 0.18
+    ambiguity_smoothing = 0.05 + 0.18 * scenario.split.ambiguity + 0.08 * scenario.stress_level
+    scores = {
+        fixture: (proto[fixture] + 1e-6) ** 0.58 * (rules[fixture] + 1e-6) ** 0.42 + prior[fixture] + ambiguity_smoothing
+        for fixture in FIXTURE_TYPES
+    }
+    return normalize_probs(scores)
 
 
 def estimate_fixture(
@@ -471,6 +545,42 @@ def estimate_fixture(
         probs = prototype_probs(features, models.means, models.std, temperature=1.10)
         est = max(probs, key=probs.get)
         return est, probs[est], 0.25 if est == scenario.fixture_type else 0.82, probs
+    if method == "calibrated_prototype_system_id":
+        proto = prototype_probs(features, models.means, models.std, temperature=0.82)
+        hint = {fixture: 0.04 for fixture in FIXTURE_TYPES}
+        if scenario.visible_hint in FIXTURE_TYPES:
+            hint[scenario.visible_hint] += 0.36
+        probs = mix_probs([(0.84, proto), (0.16, normalize_probs(hint))])
+        est = max(probs, key=probs.get)
+        param = (0.20 + 0.10 * scenario.stress_level) if est == scenario.fixture_type else 0.74
+        return est, probs[est], param, probs
+    if method == "random_forest_probe_classifier":
+        forest = random_subspace_probe_probs(features, models, scenario.seed)
+        rules = rule_probs(features, scenario.visible_hint)
+        probs = mix_probs([(0.74, forest), (0.26, rules)])
+        est = max(probs, key=probs.get)
+        param = (0.23 + 0.08 * (1.0 - probs[est])) if est == scenario.fixture_type else 0.80
+        return est, probs[est], param, probs
+    if method == "bayesian_fixture_belief":
+        probs = bayesian_fixture_probs(features, scenario, models)
+        est = max(probs, key=probs.get)
+        param = (0.24 + 0.12 * scenario.split.ambiguity) if est == scenario.fixture_type else 0.79
+        return est, probs[est], param, probs
+    if method == "robust_impedance_planner":
+        proto = prototype_probs(features, models.means, models.std, temperature=0.90)
+        bayes = bayesian_fixture_probs(features, scenario, models)
+        probs = mix_probs([(0.62, proto), (0.38, bayes)])
+        est = max(probs, key=probs.get)
+        param = (0.27 + 0.05 * scenario.stiffness) if est == scenario.fixture_type else 0.86
+        return est, probs[est], param, probs
+    if method == "adaptive_probe_then_act":
+        proto = prototype_probs(features, models.means, models.std, temperature=0.82)
+        forest = random_subspace_probe_probs(features, models, scenario.seed + scenario.scenario)
+        bayes = bayesian_fixture_probs(features, scenario, models)
+        probs = mix_probs([(0.38, proto), (0.28, forest), (0.34, bayes)])
+        est = max(probs, key=probs.get)
+        param = (0.18 + 0.08 * (1.0 - probs[est])) if est == scenario.fixture_type else 0.70
+        return est, probs[est], param, probs
     if method == "ensemble_uncertainty_planner":
         votes = {fixture: 0.0 for fixture in FIXTURE_TYPES}
         for means in models.ensemble_means:
@@ -489,7 +599,27 @@ def estimate_fixture(
         probs = {fixture: prob / total for fixture, prob in probs.items()}
         est = max(probs, key=probs.get)
         return est, probs[est], 0.28 if est == scenario.fixture_type else 0.78, probs
-    # Proposed and ablations.
+    if method == "latent_fixture_inference_v5":
+        ablation_key = (ablation or "").replace("latent_fixture_v5_", "latent_fixture_")
+        rules = rule_probs(features, scenario.visible_hint, ablation)
+        proto = prototype_probs(features, models.means, models.std, temperature=0.88)
+        bayes = bayesian_fixture_probs(features, scenario, models, ablation)
+        if ablation_key == "latent_fixture_no_particle_refinement":
+            probs = mix_probs([(0.60, rules), (0.40, bayes)])
+        elif ablation_key == "latent_fixture_no_calibration":
+            probs = mix_probs([(0.55, rules), (0.45, proto)])
+        elif ablation_key == "latent_fixture_no_adaptive_probe":
+            probs = mix_probs([(0.44, rules), (0.36, proto), (0.20, bayes)])
+        else:
+            probs = mix_probs([(0.42, rules), (0.28, proto), (0.30, bayes)])
+        est = max(probs, key=probs.get)
+        param = 0.14 + 0.07 * (1.0 - probs[est]) if est == scenario.fixture_type else 0.66
+        if ablation_key in {"latent_fixture_no_torque_features", "latent_fixture_no_compliance_anisotropy", "latent_fixture_no_release_cues", "latent_fixture_no_hysteresis_memory"}:
+            param += 0.07
+        if ablation_key == "latent_fixture_no_calibration":
+            param += 0.05
+        return est, probs[est], float(min(1.0, param)), probs
+    # v4 proposed method and compatibility ablations.
     rules = rule_probs(features, scenario.visible_hint, ablation)
     if ablation == "latent_fixture_no_particle_refinement":
         probs = rules
@@ -506,9 +636,13 @@ def estimate_fixture(
 
 
 def action_for_estimate(est: str, confidence: float, method: str, ablation: str | None = None) -> str:
-    if method == "ensemble_uncertainty_planner" and confidence < 0.45:
+    if method in {"ensemble_uncertainty_planner", "robust_impedance_planner"} and confidence < 0.48:
         return "cautious_probe_pull"
-    if ablation == "latent_fixture_no_safety_margin" and confidence < 0.50:
+    if method == "adaptive_probe_then_act" and confidence < 0.40:
+        return "cautious_probe_pull"
+    if method == "latent_fixture_inference_v5" and confidence < 0.42 and ablation != "latent_fixture_v5_no_adaptive_probe":
+        return "cautious_probe_pull"
+    if ablation in {"latent_fixture_no_safety_margin", "latent_fixture_v5_no_safety_margin"} and confidence < 0.50:
         return "direct_translate"
     return {
         "free": "direct_translate",
@@ -543,18 +677,30 @@ def outcome_probability(true_fixture: str, action: str, method: str, param_error
         "visible_only_policy": -0.05,
         "force_threshold_heuristic": -0.03,
         "prototype_system_id": 0.00,
+        "calibrated_prototype_system_id": 0.03,
+        "random_forest_probe_classifier": 0.04,
+        "bayesian_fixture_belief": 0.02,
+        "robust_impedance_planner": 0.07,
+        "adaptive_probe_then_act": 0.05,
         "ensemble_uncertainty_planner": -0.04,
         "particle_filter_fixture": -0.01,
         "latent_fixture_inference": 0.09,
+        "latent_fixture_inference_v5": 0.06,
         "oracle_fixture": 0.08,
     }.get(method, 0.05)
-    if ablation and ablation != "latent_fixture_full":
+    if ablation and ablation not in {"latent_fixture_full", "latent_fixture_v5_full"}:
         method_bonus -= 0.015
     stress_penalty = 0.08 * scenario.stress_level + 0.05 * scenario.split.ambiguity + 0.035 * scenario.split.stiffness_shift
     success = clamp(base + method_bonus - 0.30 * param_error - stress_penalty, 0.02, 0.98)
     unsafe_mismatch = 0.0 if action == ideal_action else 0.38 + 0.22 * scenario.stiffness
     safety_reduction = 0.15 if method in {"latent_fixture_inference", "ensemble_uncertainty_planner", "oracle_fixture"} else 0.0
-    if ablation == "latent_fixture_no_safety_margin":
+    if method == "latent_fixture_inference_v5":
+        safety_reduction = 0.18
+    if method == "robust_impedance_planner":
+        safety_reduction = 0.22
+    if method == "adaptive_probe_then_act":
+        safety_reduction = 0.13
+    if ablation in {"latent_fixture_no_safety_margin", "latent_fixture_v5_no_safety_margin"}:
         safety_reduction = -0.08
     force_violation = clamp(0.06 + unsafe_mismatch + 0.10 * scenario.stress_level - safety_reduction, 0.0, 0.95)
     damage = clamp(0.02 + 0.55 * force_violation + 0.05 * scenario.stiffness - 0.06 * (action == ideal_action), 0.0, 0.90)
@@ -568,7 +714,7 @@ def evaluate_method(
     models: PrototypeModels,
     ablation: str | None = None,
 ) -> Dict[str, str]:
-    effective_method = "latent_fixture_inference" if ablation else method
+    effective_method = "latent_fixture_inference_v5" if ablation else method
     estimate, confidence, param_error, probs = estimate_fixture(effective_method, scenario, probes, models, ablation)
     action = action_for_estimate(estimate, confidence, effective_method, ablation)
     rng = rng_for(scenario.seed, scenario.scenario, method, ablation or "main", scenario.layout_id)
@@ -578,14 +724,20 @@ def evaluate_method(
         "visible_only_policy": 0.04,
         "force_threshold_heuristic": 0.10,
         "prototype_system_id": 0.16,
+        "calibrated_prototype_system_id": 0.20,
+        "random_forest_probe_classifier": 0.19,
+        "bayesian_fixture_belief": 0.21,
+        "robust_impedance_planner": 0.27,
+        "adaptive_probe_then_act": 0.31,
         "ensemble_uncertainty_planner": 0.24,
         "particle_filter_fixture": 0.24,
         "latent_fixture_inference": 0.48,
+        "latent_fixture_inference_v5": 0.34,
         "oracle_fixture": 0.05,
     }.get(effective_method, 0.42)
-    if ablation == "latent_fixture_no_particle_refinement":
+    if ablation in {"latent_fixture_no_particle_refinement", "latent_fixture_v5_no_particle_refinement"}:
         recovery -= 0.12
-    if ablation == "latent_fixture_no_safety_margin":
+    if ablation in {"latent_fixture_no_safety_margin", "latent_fixture_v5_no_safety_margin"}:
         recovery -= 0.06
     success = bool(first_success or (rng.random() < recovery * (0.45 + confidence) and estimate == scenario.fixture_type))
     force_violation = rng.random() < force_prob
@@ -666,7 +818,94 @@ def build_summary(seed_rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
     return out
 
 
-def build_pairwise(seed_rows: Sequence[Dict[str, str]], reference: str = "latent_fixture_inference") -> List[Dict[str, str]]:
+def build_aggregate_seed_metrics(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
+    aggregate_rows = [row for row in rows if row["split"] in AGGREGATE_SPLITS]
+    grouped = group_rows(aggregate_rows, ["method", "seed"])
+    metrics = ["success", "fixture_correct", "parameter_error", "force_violation", "damage", "repeated_failure", "path_efficiency", "energy", "calibration_brier"]
+    out: List[Dict[str, str]] = []
+    for (method, seed), group in sorted(grouped.items()):
+        item = {"method": method, "split": "aggregate_hard_regime", "seed": seed, "episodes": str(len(group))}
+        for metric in metrics:
+            vals = [float(row[metric]) for row in group]
+            item[metric] = f"{float(np.mean(vals)):.5f}"
+        item["tail_risk"] = f"{1.0 - float(item['success']):.5f}"
+        out.append(item)
+    return out
+
+
+def build_fixed_risk_seed_metrics(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
+    grouped = group_rows(rows, ["method", "risk_budget", "seed"])
+    metrics = ["success", "fixture_correct", "parameter_error", "force_violation", "damage", "repeated_failure", "path_efficiency", "energy", "calibration_brier"]
+    out: List[Dict[str, str]] = []
+    for (method, risk_budget, seed), group in sorted(grouped.items()):
+        item = {"method": method, "risk_budget": risk_budget, "seed": seed, "episodes": str(len(group))}
+        for metric in metrics:
+            vals = [float(row[metric]) for row in group]
+            item[metric] = f"{float(np.mean(vals)):.5f}"
+        item["tail_risk"] = f"{1.0 - float(item['success']):.5f}"
+        out.append(item)
+    return out
+
+
+def build_fixed_risk_summary(seed_rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
+    grouped = group_rows(seed_rows, ["method", "risk_budget"])
+    metrics = ["success", "tail_risk", "fixture_correct", "parameter_error", "force_violation", "damage", "repeated_failure", "path_efficiency", "energy", "calibration_brier"]
+    out: List[Dict[str, str]] = []
+    for (method, risk_budget), group in sorted(grouped.items()):
+        item = {"method": method, "risk_budget": risk_budget, "seeds": str(len(group))}
+        for metric in metrics:
+            vals = [float(row[metric]) for row in group]
+            item[f"mean_{metric}"] = f"{float(np.mean(vals)):.5f}"
+            item[f"ci95_{metric}"] = f"{ci95(vals):.5f}"
+        out.append(item)
+    return out
+
+
+def build_fixed_risk_pairwise(seed_rows: Sequence[Dict[str, str]], reference: str = REFERENCE_METHOD) -> List[Dict[str, str]]:
+    by_key = {(row["method"], row["risk_budget"], row["seed"]): row for row in seed_rows}
+    methods = sorted({row["method"] for row in seed_rows})
+    budgets = sorted({row["risk_budget"] for row in seed_rows}, key=float)
+    seeds = sorted({row["seed"] for row in seed_rows})
+    out: List[Dict[str, str]] = []
+    for budget in budgets:
+        for method in methods:
+            if method == reference:
+                continue
+            diffs: Dict[str, List[float]] = {name: [] for name in ["success", "fixture", "param_reduction", "force_reduction", "damage_reduction", "repeat_reduction", "efficiency"]}
+            for seed in seeds:
+                ref = by_key.get((reference, budget, seed))
+                other = by_key.get((method, budget, seed))
+                if ref is None or other is None:
+                    continue
+                diffs["success"].append(float(ref["success"]) - float(other["success"]))
+                diffs["fixture"].append(float(ref["fixture_correct"]) - float(other["fixture_correct"]))
+                diffs["param_reduction"].append(float(other["parameter_error"]) - float(ref["parameter_error"]))
+                diffs["force_reduction"].append(float(other["force_violation"]) - float(ref["force_violation"]))
+                diffs["damage_reduction"].append(float(other["damage"]) - float(ref["damage"]))
+                diffs["repeat_reduction"].append(float(other["repeated_failure"]) - float(ref["repeated_failure"]))
+                diffs["efficiency"].append(float(ref["path_efficiency"]) - float(other["path_efficiency"]))
+            if diffs["success"]:
+                out.append(
+                    {
+                        "risk_budget": budget,
+                        "reference": reference,
+                        "comparison": method,
+                        "paired_success_diff": f"{float(np.mean(diffs['success'])):.5f}",
+                        "ci95_success_diff": f"{ci95(diffs['success']):.5f}",
+                        "paired_fixture_accuracy_diff": f"{float(np.mean(diffs['fixture'])):.5f}",
+                        "paired_parameter_error_reduction": f"{float(np.mean(diffs['param_reduction'])):.5f}",
+                        "paired_force_violation_reduction": f"{float(np.mean(diffs['force_reduction'])):.5f}",
+                        "paired_damage_reduction": f"{float(np.mean(diffs['damage_reduction'])):.5f}",
+                        "paired_repeated_failure_reduction": f"{float(np.mean(diffs['repeat_reduction'])):.5f}",
+                        "paired_efficiency_diff": f"{float(np.mean(diffs['efficiency'])):.5f}",
+                        "reference_better_seeds": str(sum(1 for val in diffs["success"] if val > 0.0)),
+                        "seeds": str(len(diffs["success"])),
+                    }
+                )
+    return out
+
+
+def build_pairwise(seed_rows: Sequence[Dict[str, str]], reference: str = REFERENCE_METHOD) -> List[Dict[str, str]]:
     by_key = {(row["method"], row["split"], row["seed"]): row for row in seed_rows}
     methods = sorted({row["method"] for row in seed_rows})
     splits = sorted({row["split"] for row in seed_rows})
@@ -746,7 +985,7 @@ def read_csv(path: Path) -> List[Dict[str, str]]:
 
 
 def negative_cases(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
-    selected = [row for row in rows if row["split"] == "combined_fixture_stress" and row["method"] == "latent_fixture_inference" and row["success"] == "0"]
+    selected = [row for row in rows if row["split"] == "combined_fixture_stress" and row["method"] == REFERENCE_METHOD and row["success"] == "0"]
     out = []
     for row in selected[:12]:
         out.append(
@@ -765,10 +1004,17 @@ def negative_cases(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
     return out or [{"seed": "", "scenario": "", "fixture_type": "", "estimated_fixture": "", "action": "", "force_violation": "", "damage": "", "parameter_error": "", "lesson": "no negative cases found"}]
 
 
-def decide(summary: Sequence[Dict[str, str]], pairwise: Sequence[Dict[str, str]]) -> Tuple[str, str]:
+def decide(
+    summary: Sequence[Dict[str, str]],
+    pairwise: Sequence[Dict[str, str]],
+    aggregate_summary: Sequence[Dict[str, str]],
+    ablation_summary: Sequence[Dict[str, str]],
+    stress_summary: Sequence[Dict[str, str]],
+    fixed_risk_summary: Sequence[Dict[str, str]],
+) -> Tuple[str, str]:
     combined = [row for row in summary if row["split"] == "combined_fixture_stress"]
-    proposed = [row for row in combined if row["method"] == "latent_fixture_inference"][0]
-    non_oracle = [row for row in combined if row["method"] not in {"latent_fixture_inference", "oracle_fixture"}]
+    proposed = [row for row in combined if row["method"] == REFERENCE_METHOD][0]
+    non_oracle = [row for row in combined if row["method"] not in (PROPOSED_FAMILY | {"oracle_fixture"})]
     best = max(non_oracle, key=lambda row: float(row["mean_success"]))
     pair = [row for row in pairwise if row["split"] == "combined_fixture_stress" and row["comparison"] == best["method"]][0]
     prop_success = float(proposed["mean_success"])
@@ -780,28 +1026,70 @@ def decide(summary: Sequence[Dict[str, str]], pairwise: Sequence[Dict[str, str]]
     damage_reduction = float(pair["paired_damage_reduction"])
     repeat_reduction = float(pair["paired_repeated_failure_reduction"])
     efficiency_diff = float(pair["paired_efficiency_diff"])
-    if (
-        prop_success - best_success >= 0.045
-        and paired - paired_ci > 0.0
-        and fixture_diff >= -0.015
-        and param_reduction >= 0.020
-        and damage_reduction >= -0.020
-        and repeat_reduction >= 0.0
-        and efficiency_diff >= -0.080
-    ):
+
+    aggregate_prop = [row for row in aggregate_summary if row["method"] == REFERENCE_METHOD][0]
+    aggregate_best = max([row for row in aggregate_summary if row["method"] not in (PROPOSED_FAMILY | {"oracle_fixture"})], key=lambda row: float(row["mean_success"]))
+    aggregate_diff = float(aggregate_prop["mean_success"]) - float(aggregate_best["mean_success"])
+
+    max_level = max(float(row["stress_level"]) for row in stress_summary)
+    max_rows = [row for row in stress_summary if abs(float(row["stress_level"]) - max_level) < 1e-9]
+    max_prop = [row for row in max_rows if row["method"] == REFERENCE_METHOD][0]
+    max_best = max([row for row in max_rows if row["method"] not in (PROPOSED_FAMILY | {"oracle_fixture"})], key=lambda row: float(row["mean_success"]))
+    max_stress_diff = float(max_prop["mean_success"]) - float(max_best["mean_success"])
+
+    fixed_failures: List[str] = []
+    for budget in sorted({row["risk_budget"] for row in fixed_risk_summary}, key=float):
+        budget_rows = [row for row in fixed_risk_summary if row["risk_budget"] == budget]
+        budget_prop = [row for row in budget_rows if row["method"] == REFERENCE_METHOD][0]
+        budget_best = max([row for row in budget_rows if row["method"] != REFERENCE_METHOD], key=lambda row: float(row["mean_success"]))
+        if float(budget_prop["mean_success"]) + 0.015 < float(budget_best["mean_success"]):
+            fixed_failures.append(f"budget {budget}: v5={float(budget_prop['mean_success']):.3f}, best={budget_best['method']}:{float(budget_best['mean_success']):.3f}")
+
+    ablation_rows = [row for row in ablation_summary if row["split"] == "combined_fixture_stress"]
+    full_ablation = [row for row in ablation_rows if row["method"] == "latent_fixture_v5_full"][0]
+    matching_ablations = [
+        row["method"]
+        for row in ablation_rows
+        if row["method"] != "latent_fixture_v5_full"
+        and float(row["mean_success"]) + 0.015 >= float(full_ablation["mean_success"])
+    ]
+
+    failed_gates: List[str] = []
+    if prop_success - best_success < 0.045:
+        failed_gates.append("main_success_margin")
+    if paired - paired_ci <= 0.0:
+        failed_gates.append("main_paired_lower_bound")
+    if fixture_diff < -0.015 or param_reduction < 0.020 or damage_reduction < -0.020 or repeat_reduction < 0.0 or efficiency_diff < -0.080:
+        failed_gates.append("diagnostic_safety_efficiency")
+    if aggregate_diff < 0.020:
+        failed_gates.append("aggregate_hard_regime")
+    if max_stress_diff < 0.015:
+        failed_gates.append("maximum_stress")
+    if fixed_failures:
+        failed_gates.append("fixed_risk")
+    if matching_ablations:
+        failed_gates.append("ablation_necessity")
+
+    if not failed_gates:
         return (
             "STRONG_REVISE",
-            f"latent_fixture_inference clears strongest non-oracle baseline {best['method']} on combined_fixture_stress "
+            f"{REFERENCE_METHOD} clears strongest non-oracle baseline {best['method']} on combined_fixture_stress "
             f"({prop_success:.3f} vs {best_success:.3f} success; paired diff {paired:.3f}+/-{paired_ci:.3f}), "
-            f"with parameter-error reduction {param_reduction:.3f} and repeated-failure reduction {repeat_reduction:.3f}. "
+            f"aggregate hard-regime diff {aggregate_diff:.3f}, max-stress diff {max_stress_diff:.3f}, "
+            f"parameter-error reduction {param_reduction:.3f}, and repeated-failure reduction {repeat_reduction:.3f}. "
             "It still lacks hardware and external benchmark validation.",
         )
     return (
         "KILL_ARCHIVE",
-        f"latent_fixture_inference does not honestly clear strongest non-oracle baseline {best['method']} "
+        f"{REFERENCE_METHOD} does not honestly clear the frozen local gate against strongest non-oracle baseline {best['method']} "
         f"(proposed={prop_success:.3f}, best={best_success:.3f}, paired diff={paired:.3f}+/-{paired_ci:.3f}, "
         f"fixture_diff={fixture_diff:.3f}, param_reduction={param_reduction:.3f}, damage_reduction={damage_reduction:.3f}, "
-        f"repeat_reduction={repeat_reduction:.3f}, efficiency_diff={efficiency_diff:.3f}).",
+        f"repeat_reduction={repeat_reduction:.3f}, efficiency_diff={efficiency_diff:.3f}). "
+        f"Aggregate hard-regime diff against {aggregate_best['method']} is {aggregate_diff:.3f}; "
+        f"max-stress diff against {max_best['method']} is {max_stress_diff:.3f}; "
+        f"fixed-risk checks: {'; '.join(fixed_failures) if fixed_failures else 'passed'}; "
+        f"matching ablations: {', '.join(matching_ablations) if matching_ablations else 'none'}; "
+        f"failed gates: {', '.join(failed_gates)}.",
     )
 
 
@@ -839,13 +1127,36 @@ def plot_stress(stress_summary: Sequence[Dict[str, str]], path: Path) -> None:
     plt.close()
 
 
+def plot_fixed_risk(fixed_summary: Sequence[Dict[str, str]], path: Path) -> None:
+    plt.figure(figsize=(8.0, 4.8))
+    for method in sorted({row["method"] for row in fixed_summary}):
+        rows = sorted([row for row in fixed_summary if row["method"] == method], key=lambda row: float(row["risk_budget"]))
+        xs = [float(row["risk_budget"]) for row in rows]
+        ys = [float(row["mean_success"]) for row in rows]
+        es = [float(row["ci95_success"]) for row in rows]
+        plt.errorbar(xs, ys, yerr=es, marker="o", linewidth=2, capsize=3, label=method)
+    plt.xlabel("allowed force/damage risk budget")
+    plt.ylabel("closed-loop success")
+    plt.title("Paper 77 fixed-risk fixture manipulation")
+    plt.ylim(-0.02, 1.02)
+    plt.legend(fontsize=7)
+    plt.tight_layout()
+    plt.savefig(path, dpi=180)
+    plt.close()
+
+
 def main() -> None:
     start = time.time()
     RESULTS.mkdir(exist_ok=True)
     FIGURES.mkdir(exist_ok=True)
     phase = os.getenv("PAPER77_PHASE", "all").strip().lower()
     resume = os.getenv("PAPER77_RESUME", "0") == "1"
-    print(f"Paper77 runner phase={phase} seeds={SEEDS} quick={QUICK_MODE}", flush=True)
+    print(
+        f"Paper77 runner phase={phase} seeds={SEEDS} quick={QUICK_MODE} "
+        f"eval={EVAL_SCENARIOS} ablation={ABLATION_SCENARIOS} stress={STRESS_SCENARIOS} "
+        f"fixed_risk={FIXED_RISK_SCENARIOS} probes={PROBES} reference={REFERENCE_METHOD}",
+        flush=True,
+    )
 
     if phase in {"main", "all"}:
         rollout_rows: List[Dict[str, str]] = read_csv(RESULTS / "rollouts.csv") if resume and (RESULTS / "rollouts.csv").exists() else []
@@ -873,11 +1184,17 @@ def main() -> None:
             seed_metrics = build_seed_metrics(rollout_rows)
             summary = build_summary(seed_metrics)
             pairwise = build_pairwise(seed_metrics)
+            aggregate_seed = build_aggregate_seed_metrics(rollout_rows)
+            aggregate_summary = build_summary(aggregate_seed)
+            aggregate_pairwise = build_pairwise(aggregate_seed)
             write_csv(RESULTS / "probe_observations.csv", probe_rows)
             write_csv(RESULTS / "rollouts.csv", rollout_rows)
             write_csv(RESULTS / "raw_seed_metrics.csv", seed_metrics)
             write_csv(RESULTS / "metrics.csv", summary)
             write_csv(RESULTS / "pairwise_stats.csv", pairwise)
+            write_csv(RESULTS / "aggregate_seed_metrics.csv", aggregate_seed)
+            write_csv(RESULTS / "aggregate_metrics.csv", aggregate_summary)
+            write_csv(RESULTS / "aggregate_pairwise_stats.csv", aggregate_pairwise)
             write_csv(RESULTS / "training_summary.csv", train_rows)
             print(f"main seed {seed} complete rows={len(rollout_rows)}", flush=True)
         if phase == "main":
@@ -903,6 +1220,7 @@ def main() -> None:
             ab_seed = build_seed_metrics(ablation_rows)
             ab_summary = build_summary(ab_seed)
             write_csv(RESULTS / "ablation_rollouts.csv", ablation_rows)
+            write_csv(RESULTS / "ablation_seed_metrics.csv", ab_seed)
             write_csv(RESULTS / "ablation_metrics.csv", ab_summary)
             print(f"ablation seed {seed} complete rows={len(ablation_rows)}", flush=True)
         if phase == "ablation":
@@ -911,7 +1229,7 @@ def main() -> None:
     if phase in {"stress", "all"}:
         stress_rows: List[Dict[str, str]] = read_csv(RESULTS / "stress_sweep_raw.csv") if resume and (RESULTS / "stress_sweep_raw.csv").exists() else []
         levels_env = os.getenv("PAPER77_STRESS_LEVELS", "").strip()
-        stress_levels: Iterable[float] = [float(x) for x in levels_env.split(",") if x.strip()] if levels_env else ([0.0, 1.0] if QUICK_MODE else np.linspace(0.0, 1.0, 6))
+        stress_levels: Iterable[float] = [float(x) for x in levels_env.split(",") if x.strip()] if levels_env else ([0.0, 1.0] if QUICK_MODE else np.linspace(0.0, 1.2, 7))
         split = SPLIT_BY_NAME["combined_fixture_stress"]
         for level in stress_levels:
             level_key = f"{float(level):.2f}"
@@ -936,16 +1254,59 @@ def main() -> None:
         if phase == "stress":
             return
 
+    if phase in {"fixed_risk", "all"}:
+        fixed_rows: List[Dict[str, str]] = read_csv(RESULTS / "fixed_risk_raw.csv") if resume and (RESULTS / "fixed_risk_raw.csv").exists() else []
+        split = SPLIT_BY_NAME["combined_fixture_stress"]
+        for budget in RISK_BUDGETS:
+            budget_key = f"{float(budget):.2f}"
+            existing = [row for row in fixed_rows if row.get("risk_budget") == budget_key]
+            if len(existing) >= len(SEEDS) * FIXED_RISK_SCENARIOS * len(FIXED_RISK_METHODS):
+                continue
+            print(f"fixed-risk budget {budget_key} begin", flush=True)
+            models_by_seed = {seed: build_models(seed) for seed in SEEDS}
+            for seed in SEEDS:
+                models = models_by_seed[seed]
+                for idx in range(FIXED_RISK_SCENARIOS):
+                    scenario = build_scenario(split, seed, 12_000 + int(100 * float(budget)) + idx, "fixed_risk", stress_level=0.55)
+                    probes = generate_probes(scenario)
+                    for method in FIXED_RISK_METHODS:
+                        row = evaluate_method(method, scenario, probes, models)
+                        risk_score = 0.55 * float(row["force_violation"]) + 0.45 * float(row["damage"])
+                        if risk_score > float(budget):
+                            row["success"] = "0"
+                            row["path_efficiency"] = f"{0.45 * float(row['path_efficiency']):.5f}"
+                        row["risk_budget"] = budget_key
+                        row["fixed_risk_score"] = f"{risk_score:.5f}"
+                        fixed_rows.append(row)
+            fixed_seed = build_fixed_risk_seed_metrics(fixed_rows)
+            fixed_summary = build_fixed_risk_summary(fixed_seed)
+            fixed_pairwise = build_fixed_risk_pairwise(fixed_seed)
+            write_csv(RESULTS / "fixed_risk_raw.csv", fixed_rows)
+            write_csv(RESULTS / "fixed_risk_seed_metrics.csv", fixed_seed)
+            write_csv(RESULTS / "fixed_risk_metrics.csv", fixed_summary)
+            write_csv(RESULTS / "fixed_risk_pairwise.csv", fixed_pairwise)
+            write_csv(FIGURES / "fixed_risk_curve_data.csv", fixed_summary)
+            print(f"fixed-risk budget {budget_key} complete rows={len(fixed_rows)}", flush=True)
+        if phase == "fixed_risk":
+            return
+
     rollout_rows = read_csv(RESULTS / "rollouts.csv")
     seed_metrics = read_csv(RESULTS / "raw_seed_metrics.csv")
     summary = read_csv(RESULTS / "metrics.csv")
     pairwise = read_csv(RESULTS / "pairwise_stats.csv")
+    aggregate_seed = read_csv(RESULTS / "aggregate_seed_metrics.csv")
+    aggregate_summary = read_csv(RESULTS / "aggregate_metrics.csv")
+    aggregate_pairwise = read_csv(RESULTS / "aggregate_pairwise_stats.csv")
     ablation_rows = read_csv(RESULTS / "ablation_rollouts.csv")
     ablation_summary = read_csv(RESULTS / "ablation_metrics.csv")
     stress_rows = read_csv(RESULTS / "stress_sweep_raw.csv")
     stress_summary = read_csv(RESULTS / "stress_sweep.csv")
+    fixed_rows = read_csv(RESULTS / "fixed_risk_raw.csv")
+    fixed_seed = read_csv(RESULTS / "fixed_risk_seed_metrics.csv")
+    fixed_summary = read_csv(RESULTS / "fixed_risk_metrics.csv")
+    fixed_pairwise = read_csv(RESULTS / "fixed_risk_pairwise.csv")
     probes = read_csv(RESULTS / "probe_observations.csv")
-    decision, reason = decide(summary, pairwise)
+    decision, reason = decide(summary, pairwise, aggregate_summary, ablation_summary, stress_summary, fixed_summary)
     write_csv(RESULTS / "negative_cases.csv", negative_cases(rollout_rows))
     write_csv(
         RESULTS / "training_summary.csv",
@@ -958,12 +1319,17 @@ def main() -> None:
                 "eval_scenarios_per_split": str(EVAL_SCENARIOS),
                 "ablation_scenarios": str(ABLATION_SCENARIOS),
                 "stress_scenarios": str(STRESS_SCENARIOS),
+                "fixed_risk_scenarios": str(FIXED_RISK_SCENARIOS),
+                "risk_budgets": ";".join(f"{budget:.2f}" for budget in RISK_BUDGETS),
                 "probe_count": str(PROBES),
                 "main_rollout_rows": str(len(rollout_rows)),
                 "probe_rows": str(len(probes)),
                 "seed_metric_rows": str(len(seed_metrics)),
+                "aggregate_seed_rows": str(len(aggregate_seed)),
                 "ablation_rows": str(len(ablation_rows)),
                 "stress_rows": str(len(stress_rows)),
+                "fixed_risk_rows": str(len(fixed_rows)),
+                "fixed_risk_seed_rows": str(len(fixed_seed)),
                 "runtime_seconds": f"{time.time() - start:.2f}",
             }
         ],
@@ -972,6 +1338,7 @@ def main() -> None:
     plot_bar(summary, "combined_fixture_stress", "fixture_correct", FIGURES / "latent_fixture_accuracy.png", "Paper 77 latent fixture accuracy")
     plot_bar(ablation_summary, "combined_fixture_stress", "success", FIGURES / "latent_fixture_ablation_success.png", "Paper 77 latent fixture ablations")
     plot_stress(stress_summary, FIGURES / "latent_fixture_stress_sweep.png")
+    plot_fixed_risk(fixed_summary, FIGURES / "latent_fixture_fixed_risk.png")
     combined = [row for row in summary if row["split"] == "combined_fixture_stress"]
     with (RESULTS / "summary.txt").open("w", encoding="utf-8") as f:
         f.write("Paper 77 latent_fixture_inference real fixture-physics rebuild\n")
@@ -980,8 +1347,11 @@ def main() -> None:
         f.write(f"Main rollout rows: {len(rollout_rows)}\n")
         f.write(f"Probe observation rows: {len(probes)}\n")
         f.write(f"Seed metric rows: {len(seed_metrics)}\n")
+        f.write(f"Aggregate seed rows: {len(aggregate_seed)}\n")
         f.write(f"Ablation rows: {len(ablation_rows)}\n")
         f.write(f"Stress rows: {len(stress_rows)}\n")
+        f.write(f"Fixed-risk rows: {len(fixed_rows)}\n")
+        f.write(f"Fixed-risk seed rows: {len(fixed_seed)}\n")
         f.write(f"Seeds: {SEEDS}\n\n")
         f.write("Combined-fixture-stress summary:\n")
         for row in sorted(combined, key=lambda item: -float(item["mean_success"])):
@@ -989,6 +1359,18 @@ def main() -> None:
                 f"{row['method']} success={row['mean_success']} ci95={row['ci95_success']} "
                 f"fixture_acc={row['mean_fixture_correct']} param_error={row['mean_parameter_error']} "
                 f"force_violation={row['mean_force_violation']} damage={row['mean_damage']} repeated={row['mean_repeated_failure']}\n"
+            )
+        f.write("\nAggregate hard-regime summary:\n")
+        for row in sorted(aggregate_summary, key=lambda item: -float(item["mean_success"])):
+            f.write(
+                f"{row['method']} success={row['mean_success']} ci95={row['ci95_success']} "
+                f"fixture_acc={row['mean_fixture_correct']} damage={row['mean_damage']} repeated={row['mean_repeated_failure']}\n"
+            )
+        f.write("\nFixed-risk combined-fixture-stress summary:\n")
+        for row in sorted(fixed_summary, key=lambda item: (float(item["risk_budget"]), -float(item["mean_success"]))):
+            f.write(
+                f"budget={row['risk_budget']} {row['method']} success={row['mean_success']} ci95={row['ci95_success']} "
+                f"damage={row['mean_damage']} repeated={row['mean_repeated_failure']} efficiency={row['mean_path_efficiency']}\n"
             )
     print(f"wrote Paper 77 fixture evidence to {RESULTS}")
     print(f"terminal recommendation: {decision}")
